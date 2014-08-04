@@ -100,12 +100,13 @@ public class ActiveNotifier implements FineGrainedNotifier {
             authors.add(entry.getAuthor().getDisplayName());
         }
         MessageBuilder message = new MessageBuilder(notifier, r);
-        message.append("Started by changes from ");
         message.append(StringUtils.join(authors, ", "));
+        message.append(" started via :github:");
         message.append(" (");
         message.append(files.size());
         message.append(" file(s) changed)");
-        return message.appendOpenLink().toString();
+        message.append(" _`" + build.getProject().getDisplayName() + "`_");
+        return message.toString();
     }
 
     static String getBuildColor(AbstractBuild r) {
@@ -174,6 +175,20 @@ public class ActiveNotifier implements FineGrainedNotifier {
             // message.append(" - *");
             // message.append(this.escape(build.getDisplayName()));
             // message.append("* ");
+            if (build.isBuilding()) {
+                message.append(":blue: ");
+            } else {
+                Result result = build.getResult();
+                Run previousBuild = build.getProject().getLastBuild().getPreviousBuild();
+                Result previousResult = (previousBuild != null) ? previousBuild.getResult() : Result.SUCCESS;
+                if (result == Result.SUCCESS && previousResult == Result.FAILURE) message.append(":green: ");
+                if (result == Result.SUCCESS) message.append(":green: ");
+                if (result == Result.FAILURE) message.append(":red: ");
+                if (result == Result.ABORTED) message.append(":yellow: ");
+                if (result == Result.NOT_BUILT) message.append(":yellow: ");
+                if (result == Result.UNSTABLE) message.append(":yellow: ");
+            }
+
             String url = notifier.getBuildServerUrl() + build.getUrl();
             message.append(
                 "*<https://ci.servmask.com" + url + "/console|" + this.escape(build.getDisplayName()) + ">* "
