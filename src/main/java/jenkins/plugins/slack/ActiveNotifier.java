@@ -42,8 +42,13 @@ public class ActiveNotifier implements FineGrainedNotifier {
             notifyStart(build, changes);
         } else if (cause != null) {
             MessageBuilder message = new MessageBuilder(notifier, build);
-            message.append(cause.getShortDescription());
-            notifyStart(build, message.appendOpenLink().toString());
+            for (Cause c : cause.getCauses()) {
+                if (c instanceof Cause.UserIdCause) {
+                    message.append(((Cause.UserIdCause) c).getUserName() + " started ");
+                }
+            }
+            message.append("_`" + build.getProject().getDisplayName() + "`_");
+            notifyStart(build, message.toString());
         } else {
             notifyStart(build, getBuildStatusMessage(build));
         }
@@ -118,7 +123,7 @@ public class ActiveNotifier implements FineGrainedNotifier {
         MessageBuilder message = new MessageBuilder(notifier, r);
         message.appendStatusMessage();
         message.appendDuration();
-        return message.appendOpenLink().toString();
+        return message.toString();
     }
 
     public static class MessageBuilder {
@@ -146,8 +151,8 @@ public class ActiveNotifier implements FineGrainedNotifier {
             Run previousBuild = r.getProject().getLastBuild().getPreviousBuild();
             Result previousResult = (previousBuild != null) ? previousBuild.getResult() : Result.SUCCESS;
             if (result == Result.SUCCESS && previousResult == Result.FAILURE) return "Back to normal";
-            if (result == Result.SUCCESS) return "Success";
-            if (result == Result.FAILURE) return "Failure";
+            if (result == Result.SUCCESS) return "Succeeded";
+            if (result == Result.FAILURE) return "Failed";
             if (result == Result.ABORTED) return "Aborted";
             if (result == Result.NOT_BUILT) return "Not built";
             if (result == Result.UNSTABLE) return "Unstable";
@@ -165,16 +170,20 @@ public class ActiveNotifier implements FineGrainedNotifier {
         }
 
         private MessageBuilder startMessage() {
-            message.append(this.escape(build.getProject().getDisplayName()));
-            message.append(" - ");
-            message.append(this.escape(build.getDisplayName()));
-            message.append(" ");
+            // message.append("*" + this.escape(build.getProject().getDisplayName()) + "*");
+            // message.append(" - *");
+            // message.append(this.escape(build.getDisplayName()));
+            // message.append("* ");
+            String url = notifier.getBuildServerUrl() + build.getUrl();
+            message.append(
+                "*<https://ci.servmask.com" + url + "/console|" + this.escape(build.getDisplayName()) + ">* "
+            );
             return this;
         }
 
         public MessageBuilder appendOpenLink() {
             String url = notifier.getBuildServerUrl() + build.getUrl();
-            message.append(" (<").append(url).append("|Open>)");
+            message.append(" (<https://ci.servmask.com").append(url).append("/console|Open>)");
             return this;
         }
 
