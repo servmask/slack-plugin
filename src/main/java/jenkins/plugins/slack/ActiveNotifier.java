@@ -105,7 +105,7 @@ public class ActiveNotifier implements FineGrainedNotifier {
         message.append(" (");
         message.append(files.size());
         message.append(" file(s) changed)");
-        message.append(" _`" + build.getProject().getDisplayName() + "`_");
+        message.append(" _`" + r.getProject().getDisplayName() + "`_");
         return message.toString();
     }
 
