@@ -181,7 +181,6 @@ public class ActiveNotifier implements FineGrainedNotifier {
                 Result result = build.getResult();
                 Run previousBuild = build.getProject().getLastBuild().getPreviousBuild();
                 Result previousResult = (previousBuild != null) ? previousBuild.getResult() : Result.SUCCESS;
-                if (result == Result.SUCCESS && previousResult == Result.FAILURE) message.append(":green: ");
                 if (result == Result.SUCCESS) message.append(":green: ");
                 if (result == Result.FAILURE) message.append(":red: ");
                 if (result == Result.ABORTED) message.append(":yellow: ");
