@@ -190,14 +190,14 @@ public class ActiveNotifier implements FineGrainedNotifier {
 
             String url = notifier.getBuildServerUrl() + build.getUrl();
             message.append(
-                "*<https://ci.servmask.com" + url + "/console|" + this.escape(build.getDisplayName()) + ">* "
+                "*<" + url + ">* "
             );
             return this;
         }
 
         public MessageBuilder appendOpenLink() {
             String url = notifier.getBuildServerUrl() + build.getUrl();
-            message.append(" (<https://ci.servmask.com").append(url).append("/console|Open>)");
+            message.append(" (<").append(url).append("|Open>)");
             return this;
         }
 
