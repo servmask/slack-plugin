@@ -190,7 +190,7 @@ public class ActiveNotifier implements FineGrainedNotifier {
 
             String url = notifier.getBuildServerUrl() + build.getUrl();
             message.append(
-                "*<" + url + ">* "
+                "*<" + url + "|" + this.escape(build.getDisplayName()) + ">* "
             );
             return this;
         }
